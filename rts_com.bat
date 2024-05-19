@@ -1,81 +1,89 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal EnableDelayedExpansion
 
-:: Define the directory to watch for command files
-set COMMAND_DIR=C:\rts_commands
+REM Set initial balance
+set balance=1000
 
-:: Create the directory if it doesn't exist
-if not exist "%COMMAND_DIR%" mkdir "%COMMAND_DIR%"
-
-:main
+:menu
 cls
-echo RTS Space Bot is running...
-echo Watching Camera directory: %COMMAND_DIR%
+echo 1. Check Balance
+echo 2. Deposit
+echo 3. Withdraw
+echo 4. Talk to the bot
+echo 5. RTS Command Response System
+echo 6. Exit
+set /p choice=Enter your choice: 
 
-:: Loop to check for new command files
-:loop
-for %%F in ("%COMMAND_DIR%\*.cmd") do (
-    echo Found command file: %%~nxF
-    call "%%F"
-    echo Deleting command file: %%~nxF
-    del "%%F"
+if "%choice%"=="1" goto check_balance
+if "%choice%"=="2" goto deposit
+if "%choice%"=="3" goto withdraw
+if "%choice%"=="4" goto chat_bot
+if "%choice%"=="5" goto rts_command_response
+if "%choice%"=="6" goto end
+
+REM Check Balance
+:check_balance
+cls
+echo Your balance is: %balance%
+pause
+goto menu
+
+REM Deposit
+:deposit
+cls
+set /p amount=Enter the amount to deposit: 
+set /a balance+=amount
+echo Amount deposited successfully.
+pause
+goto menu
+
+REM Withdraw
+:withdraw
+cls
+set /p amount=Enter the amount to withdraw: 
+if %amount% gtr %balance% (
+    echo Insufficient funds!
+) else (
+    set /a balance-=amount
+    echo Amount withdrawn successfully.
 )
+pause
+goto menu
 
-:: Wait for a second before checking again
-ping -n 2 127.0.0.1 > nul
-goto loop
+REM Chat with bot
+:chat_bot
+cls
+set /p input=You: 
+if /I "%input%"=="hello" (
+    echo Bot: Hello there!
+) else if /I "%input%"=="how are you" (
+    echo Bot: I'm just a humble batch script, I don't have feelings, but thank you for asking!
+) else if /I "%input%"=="bye" (
+    echo Bot: Goodbye!
+) else (
+    echo Bot: I'm sorry, I don't understand. Try asking me 'hello', 'how are you', or 'bye'.
+)
+pause
+goto menu
+
+REM RTS Command Response System
+:rts_command_response
+cls
+echo Type a command and press Enter to see the response. Type 'exit' to return to the menu.
+set /p rts_command=Command: 
+if /I "%rts_command%"=="what is your mission" (
+    echo Bot: My mission is to assist users in managing their finances efficiently.
+) else if /I "%rts_command%"=="who created you" (
+    echo Bot: I was created by [Your Name].
+) else if /I "%rts_command%"=="what can you do" (
+    echo Bot: I can perform basic banking operations like checking balance, depositing, and withdrawing funds. You can also chat with me!
+) else if /I "%rts_command%"=="exit" (
+    goto menu
+) else (
+    echo Bot: Command not recognized. Please try again or type 'exit' to return to the menu.
+)
+pause
+goto rts_command_response
 
 :end
-endlocal
-exit /b
-
-:: Command Definitions
-
-:adjust_tax_rate
-@echo off
-echo Adjusting tax rate for faction %1 to %2
-:: Replace the below line with the actual game command
-echo adjust_tax_rate %1 %2
-exit /b
-
-:harvest_resources
-@echo off
-echo Harvesting resources from settlement %1 of type %2
-:: Replace the below line with the actual game command
-echo harvest_resources %1 %2
-exit /b
-
-:assign_mission
-@echo off
-echo Assigning mission of type %2 to character %1 targeting %3
-:: Replace the below line with the actual game command
-echo assign_mission %1 %2 %3
-exit /b
-
-:train_unit
-@echo off
-echo Training %3 units of type %2 in settlement %1
-:: Replace the below line with the actual game command
-echo train_unit %1 %2 %3
-exit /b
-
-:create_endangered_status
-@echo off
-echo Creating endangered status for faction %2 by faction %1
-:: Replace the below line with the actual game command
-echo create_endangered_status %1 %2
-exit /b
-
-:create_alliance
-@echo off
-echo Creating an alliance between faction %1 and faction %2
-:: Replace the below line with the actual game command
-echo create_alliance %1 %2
-exit /b
-
-:recognize_faction
-@echo off
-echo Recognizing faction %2 as a legitimate entity by faction %1
-:: Replace the below line with the actual game command
-echo recognize_faction %1 %2
-exit /b
+exit
